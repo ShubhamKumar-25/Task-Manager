@@ -108,7 +108,6 @@ const patchTask = async (req, res) => {
         const updatedTask = await task.findByIdAndUpdate(
             taskId,
             req.body,
-            // { new: true, runValidators: true }
             { returnDocument: 'after', runValidators: true }
         );
 

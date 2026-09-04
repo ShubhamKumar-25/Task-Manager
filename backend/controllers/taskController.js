@@ -77,7 +77,6 @@ const updateTask = async (req, res) => {
         const updatedTask = await task.findByIdAndUpdate(
             taskId,
             { title, description, priority, status, dueDate },
-            // { new: true, runValidators: true }
             { returnDocument: 'after', runValidators: true }
         );
 

@@ -1,5 +1,6 @@
 const task = require("../models/TaskModel");
 
+// Fecteched All Data
 const getAllTasks = async (req, res) => {
     try {
         const tasks = await task.find();
@@ -17,6 +18,7 @@ const getAllTasks = async (req, res) => {
     }
 };
 
+// Fecteched Data from User Id 
 const getTaskById = async (req, res) => {
     try {
         const taskId = req.params.id;
@@ -41,6 +43,7 @@ const getTaskById = async (req, res) => {
     }
 };
 
+// Create a New task
 const createTask = async (req, res) => {
     try {
         const { title, description, priority, status, dueDate } = req.body;
@@ -69,6 +72,7 @@ const createTask = async (req, res) => {
     }
 };
 
+// Update the task
 const updateTask = async (req, res) => {
     try {
         const taskId = req.params.id;
@@ -101,6 +105,7 @@ const updateTask = async (req, res) => {
     }
 };
 
+// partially update task
 const patchTask = async (req, res) => {
     try {
         const taskId = req.params.id;
@@ -131,6 +136,7 @@ const patchTask = async (req, res) => {
     }
 };
 
+// delete the task
 const deleteTask = async (req, res) => {
     try {
         const taskId = req.params.id;

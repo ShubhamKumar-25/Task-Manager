@@ -52,4 +52,74 @@ const signup = async (req, res) => {
 };
 
 
-// 
+// Login
+
+const login = async (req, res) => {
+    try {
+        
+        const { email , password } = req.body;
+
+        if(!email || !password){
+            return res.status(404).json({
+                success: false,
+                message: "All Field is required"
+            })
+        };
+
+        const user = await User.findOne({ email });
+        if(!user){
+            return res.status(402).json({
+                success: false,
+                message: "Invalid email and password"
+            })
+        }
+
+        const isPasswordCorrect = await bcrypt.compare(
+            password,
+            user.password
+        );
+
+        if(!isPasswordCorrect){
+            return res.status(404).json({
+                success: false,
+                message: "Invalid email and password"
+            })
+        }
+
+        // jwt
+        const token = jwt.sign(
+            {
+                userId: user._id
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "id"
+            }
+        );
+
+
+        res.status(200).json({
+            success: true,
+            message: "User login successfully",
+            token,
+            user:{
+                id: user._id,
+                name: user.name,
+                email: user.email
+            }
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        })
+    }
+};
+
+
+module.exports = {
+    signup,
+    login
+}

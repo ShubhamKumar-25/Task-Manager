@@ -266,3 +266,5 @@ Apart from basic CRUD:
 17. GITHUB DESCRIPTION
 ----------------------
 Task Management API with JWT Authentication, MVC Architecture, and CRUD Operations using Node.js, Express.js & MongoDB.
+
+Full-stack Task Management application with JWT authentication, secure user login/signup, and complete CRUD operations using Node.js, Express.js, MongoDB, and MVC architecture.

@@ -1,0 +1,270 @@
+TASK MANAGEMENT CRUD + JWT AUTHENTICATION — SUMMARY
+
+1. PROJECT GOAL
+----------------
+Built a real-world Task Management backend instead of repeatedly practicing User CRUD.
+The project uses MVC architecture and includes:
+- Task CRUD operations
+- PUT and PATCH updates
+- MongoDB + Mongoose
+- JWT authentication
+- Password hashing with bcryptjs
+- Protected task routes
+- User-specific tasks
+
+2. TASK MODEL
+-------------
+Task fields:
+- title: String, required, trim
+- description: String, required, trim
+- priority: String, enum ["Low", "Medium", "High"], default "Medium"
+- status: String, enum ["Pending", "In Progress", "Completed"], default "Pending"
+- dueDate: Date, required
+- user: ObjectId, ref "User", required
+- timestamps: true
+
+The user field connects every task to the user who created it.
+
+3. USER MODEL
+-------------
+User fields:
+- name: String, required, trim
+- email: String, required, unique, trim, lowercase
+- password: String, required
+- timestamps: true
+
+Passwords must be hashed before storing them in MongoDB.
+
+4. TASK CRUD APIs
+-----------------
+POST   /api/tasks          -> Create task
+GET    /api/tasks          -> Get logged-in user's tasks
+GET    /api/tasks/:id      -> Get one task
+PUT    /api/tasks/:id      -> Complete/full task update
+PATCH  /api/tasks/:id      -> Partial task update
+DELETE /api/tasks/:id      -> Delete task
+
+5. PUT VS PATCH
+---------------
+PUT:
+- Used for complete/full resource update.
+- Usually sends all task fields.
+
+PATCH:
+- Used for partial update.
+- Example: only update status:
+  { "status": "Completed" }
+
+For Mongoose updates:
+{
+    returnDocument: "after",
+    runValidators: true
+}
+
+returnDocument: "after" returns the updated document.
+runValidators: true applies schema validation during updates.
+
+6. AUTHENTICATION APIs
+----------------------
+POST /api/auth/signup
+Body:
+{
+    "name": "Shubham",
+    "email": "shubham@gmail.com",
+    "password": "123456"
+}
+
+Signup flow:
+Request -> Validate fields -> Check existing user -> Hash password with bcrypt -> Create user.
+
+POST /api/auth/login
+Body:
+{
+    "email": "shubham@gmail.com",
+    "password": "123456"
+}
+
+Login flow:
+Request -> Find user -> Compare password with bcrypt -> Generate JWT -> Return token.
+
+7. JWT AUTHENTICATION
+---------------------
+JWT contains the user's ID:
+{
+    userId: user._id
+}
+
+Token is signed using:
+process.env.JWT_SECRET
+
+Example:
+Authorization: Bearer YOUR_TOKEN
+
+The auth middleware:
+1. Reads Authorization header.
+2. Extracts Bearer token.
+3. Verifies JWT.
+4. Stores decoded data in req.user.
+5. Calls next() if token is valid.
+6. Returns 401 if token is missing, invalid, or expired.
+
+8. USER-SPECIFIC TASKS
+----------------------
+Instead of:
+Task.find()
+
+Use:
+Task.find({
+    user: req.user.userId
+})
+
+When creating a task:
+user: req.user.userId
+
+This means each task belongs to a specific logged-in user.
+
+For update/delete/get-by-id, use both:
+{
+    _id: taskId,
+    user: req.user.userId
+}
+
+This prevents one user from accessing or modifying another user's tasks.
+
+9. MVC STRUCTURE
+----------------
+backend/
+|
+|-- config/
+|   |-- db.js
+|
+|-- controllers/
+|   |-- authController.js
+|   |-- taskController.js
+|
+|-- middleware/
+|   |-- authMiddleware.js
+|
+|-- models/
+|   |-- UserModel.js
+|   |-- TaskModel.js
+|
+|-- routes/
+|   |-- authRoute.js
+|   |-- taskRoute.js
+|
+|-- .env
+|-- server.js
+|-- package.json
+
+10. ROUTING
+-----------
+authRoute.js:
+POST /signup -> authController.signup
+POST /login  -> authController.login
+
+taskRoute.js:
+All task routes use authMiddleware before taskController.
+
+server.js:
+app.use("/api/auth", authRouter)
+app.use("/api", taskRouter)
+
+11. SERVER SETUP
+----------------
+server.js includes:
+- dotenv.config()
+- connectDB()
+- express.json()
+- Auth routes
+- Task routes
+- Root API test route
+- PORT configuration
+
+Example:
+const PORT = process.env.PORT || 5000;
+
+12. IMPORTANT PACKAGES
+----------------------
+express
+mongoose
+dotenv
+bcryptjs
+jsonwebtoken
+
+13. POSTMAN TESTING ORDER
+-------------------------
+1. Signup
+2. Login
+3. Copy JWT token
+4. Create Task with Authorization header
+5. Get all tasks
+6. Get task by ID
+7. PUT task
+8. PATCH task
+9. DELETE task
+
+Authorization header:
+Authorization: Bearer YOUR_TOKEN
+
+14. REAL-WORLD FLOW
+-------------------
+Signup
+  |
+  v
+Login
+  |
+  v
+JWT Token
+  |
+  v
+Frontend stores token
+  |
+  v
+Dashboard
+  |
+  v
+Protected Task APIs
+  |
+  v
+Only logged-in user's tasks
+
+15. FRONTEND PLAN
+-----------------
+React frontend can contain:
+- Login.jsx
+- Signup.jsx
+- Dashboard.jsx
+
+Frontend flow:
+Signup -> Login -> Save JWT -> Dashboard -> Fetch user's tasks
+
+Dashboard can provide:
+- Create Task
+- View Tasks
+- Update Task
+- Change status/priority
+- Delete Task
+- Logout
+
+16. NEW CONCEPTS LEARNED
+------------------------
+Apart from basic CRUD:
+- MVC architecture
+- Mongoose enum validation
+- Default values
+- timestamps
+- PUT vs PATCH
+- JWT authentication
+- Password hashing with bcrypt
+- Authentication middleware
+- Protected routes
+- Authorization/user ownership
+- ObjectId relationship using ref
+- User-specific database queries
+
+17. GITHUB DESCRIPTION
+----------------------
+Task Management API with JWT Authentication, MVC Architecture, and CRUD Operations using Node.js, Express.js & MongoDB.
+
+Full-stack Task Management application with JWT authentication, secure user login/signup, and complete CRUD operations using Node.js, Express.js, MongoDB, and MVC architecture.
